@@ -1,0 +1,11 @@
+{
+  "name": "Morning Intake",
+  "short_name": "Morning",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f6f8fa",
+  "theme_color": "#2f4a73",
+  "icons": [
+    {"src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Morning">
+<title>Morning Intake</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{
+    --bg:#f6f8fa; --card:#fff; --ink:#14181f; --muted:#5b6472; --faint:#98a2ae;
+    --accent:#2f4a73; --accent-bg:#eef2f8; --accent-bd:#d3ddec; --green:#1f8a4c;
+    --amber:#a8790f; --red:#b0403a; --bd:#e6e9ee;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0f1216;--card:#171b21;--ink:#e9edf2;--muted:#9aa4b2;--faint:#6b7683;
+          --accent:#7ea2d8;--accent-bg:#1b2330;--accent-bd:#2b3646;--bd:#252c36;}
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.45 -apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+       padding:max(16px,env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom));}
+  header{margin:8px 2px 18px}
+  h1{font-size:26px;margin:0;letter-spacing:-.4px}
+  .sub{color:var(--accent);font-weight:600;font-size:14px;margin-top:4px}
+  .ctx{color:var(--faint);font-size:13px;margin-top:2px}
+  section{background:var(--card);border:1px solid var(--bd);border-radius:14px;
+          padding:14px;margin-bottom:12px}
+  .lbl{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);
+       font-weight:700;margin-bottom:10px}
+  .opts{display:grid;gap:8px}
+  .opts.two{grid-template-columns:1fr 1fr}
+  .opts.three{grid-template-columns:1fr 1fr 1fr}
+  button.opt{appearance:none;border:1.5px solid var(--bd);background:transparent;color:var(--ink);
+       border-radius:11px;padding:13px 10px;font-size:15px;font-weight:600;cursor:pointer;
+       transition:.12s;text-align:center;font-family:inherit}
+  button.opt:active{transform:scale(.97)}
+  button.opt[aria-pressed="true"]{background:var(--accent-bg);border-color:var(--accent);
+       color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+  textarea,input[type=text]{width:100%;border:1.5px solid var(--bd);border-radius:11px;
+       background:transparent;color:var(--ink);padding:12px;font:inherit;resize:vertical}
+  textarea:focus,input:focus{outline:none;border-color:var(--accent)}
+  .hint{color:var(--faint);font-size:12.5px;margin-top:8px}
+  footer{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+       background:linear-gradient(to top,var(--bg) 72%,transparent);}
+  #send{width:100%;border:0;border-radius:13px;background:var(--accent);color:#fff;
+       padding:16px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
+  #send:active{transform:scale(.99)}
+  #send[disabled]{opacity:.5}
+  .ok{text-align:center;padding:40px 16px}
+  .ok .big{font-size:44px}
+  .err{color:var(--red);font-size:13px;margin-top:8px;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 id="date">Morning</h1>
+    <div class="sub" id="sub">Two taps. Then your brief.</div>
+    <div class="ctx" id="ctx"></div>
+  </header>
+
+  <section>
+    <div class="lbl">What's today's shape?</div>
+    <div class="opts three" id="shape">
+      <button class="opt" data-v="heads">📝<br>Heads-down</button>
+      <button class="opt" data-v="meetings">🤝<br>Meetings</button>
+      <button class="opt" data-v="admin">🧹<br>Admin</button>
+      <button class="opt" data-v="light">🌿<br>Light</button>
+      <button class="opt" data-v="travel">✈️<br>Travel</button>
+      <button class="opt" data-v="writing">✍️<br>Writing</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="lbl">What does a win look like?</div>
+    <textarea id="one" rows="2" placeholder="One line — the thing that would make today count…"></textarea>
+    <div class="hint">Leave blank to keep the system's pick. Dictate with the 🎤 on your keyboard.</div>
+  </section>
+
+  <section>
+    <div class="lbl">Protect anything?</div>
+    <div class="opts two" id="protect">
+      <button class="opt" data-v="focus">Morning focus</button>
+      <button class="opt" data-v="workout">The workout</button>
+      <button class="opt" data-v="family">Family time</button>
+      <button class="opt" data-v="none">Nothing</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="lbl">Energy</div>
+    <div class="opts three" id="energy">
+      <button class="opt" data-v="good">🟢 Good</button>
+      <button class="opt" data-v="ok">🟡 OK</button>
+      <button class="opt" data-v="frayed">🔴 Frayed</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="lbl">Anything on your mind?</div>
+    <textarea id="note" rows="2" placeholder="Optional — goes to the consult, not the card."></textarea>
+  </section>
+
+  <div class="err" id="err"></div>
+</div>
+
+<div id="done" class="ok" hidden>
+  <div class="big">✓</div>
+  <h1>Got it</h1>
+  <div class="sub" id="doneSub">Your brief will reflect this.</div>
+</div>
+
+<footer id="foot"><button id="send">Send · then brief me</button></footer>
+
+<script>
+(function(){
+  var qs = new URLSearchParams(location.search);
+  // The ntfy topic comes from the URL (your home-screen bookmark), never from this public page.
+  var topic = qs.get('t') || localStorage.getItem('intakeTopic') || '';
+  if (topic) localStorage.setItem('intakeTopic', topic);
+
+  var d = new Date();
+  var iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  document.getElementById('date').textContent =
+    d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'});
+
+  var picked = {};
+  function wire(id){
+    var box = document.getElementById(id);
+    box.addEventListener('click', function(e){
+      var b = e.target.closest('button.opt'); if(!b) return;
+      [].forEach.call(box.querySelectorAll('button.opt'), function(x){ x.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      picked[id] = b.dataset.v;
+      if (navigator.vibrate) navigator.vibrate(8);
+    });
+  }
+  ['shape','protect','energy'].forEach(wire);
+
+  // Pre-fill context: the 6:20 push publishes a `ctx:{...}` message we can read back.
+  if (topic){
+    fetch('https://ntfy.sh/'+topic+'/json?poll=1&since=12h')
+      .then(function(r){ return r.text(); })
+      .then(function(t){
+        var ctx=null;
+        t.trim().split('\n').forEach(function(line){
+          try{ var m=JSON.parse(line);
+            if(m.event==='message' && (m.message||'').indexOf('ctx:')===0){
+              ctx = JSON.parse(m.message.slice(4));
+            }
+          }catch(e){}
+        });
+        if(ctx){
+          var bits=[];
+          if(ctx.rec!=null) bits.push('Recovery '+ctx.rec+'%');
+          if(ctx.sleep!=null) bits.push('Sleep '+ctx.sleep+'h');
+          if(ctx.training) bits.push(ctx.training);
+          document.getElementById('ctx').textContent = bits.join(' · ');
+          if(ctx.one){ document.getElementById('one').placeholder = 'System says: '+ctx.one; }
+          if(ctx.guess){
+            var g=document.querySelector('#shape button[data-v="'+ctx.guess+'"]');
+            if(g){ g.setAttribute('aria-pressed','true'); picked.shape=ctx.guess; }
+          }
+        }
+      }).catch(function(){});
+  }
+
+  document.getElementById('send').addEventListener('click', function(){
+    var err = document.getElementById('err');
+    if(!topic){ err.textContent='No topic set — open this from your saved link (…?t=your-topic).'; return; }
+    var payload = {
+      shape:   picked.shape   || '',
+      protect: picked.protect || '',
+      energy:  picked.energy  || '',
+      one:  document.getElementById('one').value.trim(),
+      note: document.getElementById('note').value.trim()
+    };
+    var btn=this; btn.disabled=true; btn.textContent='Sending…';
+    // ONE atomic message; brief.py merges the json blob.
+    fetch('https://ntfy.sh/'+topic, {
+      method:'POST',
+      body:'intake:'+iso+':json:'+JSON.stringify(payload)
+    }).then(function(r){
+      if(!r.ok) throw new Error(r.status);
+      document.getElementById('app').hidden=true;
+      document.getElementById('foot').hidden=true;
+      document.getElementById('done').hidden=false;
+      if (navigator.vibrate) navigator.vibrate([10,40,10]);
+    }).catch(function(e){
+      btn.disabled=false; btn.textContent='Send · then brief me';
+      err.textContent='Could not send ('+e.message+'). Check signal and retry.';
+    });
+  });
+})();
+</script>
+</body>
+</html>
