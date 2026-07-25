@@ -43,6 +43,8 @@
        background:transparent;color:var(--ink);padding:12px;font:inherit;resize:vertical}
   textarea:focus,input:focus{outline:none;border-color:var(--accent)}
   .hint{color:var(--faint);font-size:12.5px;margin-top:8px}
+  .proposal{background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:11px;
+       padding:12px 13px;font-size:15.5px;line-height:1.4;color:var(--ink);font-weight:500}
   footer{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
        background:linear-gradient(to top,var(--bg) 72%,transparent);}
   #send{width:100%;border:0;border-radius:13px;background:var(--accent);color:#fff;
@@ -74,10 +76,17 @@
     </div>
   </section>
 
-  <section>
-    <div class="lbl">What does a win look like?</div>
-    <textarea id="one" rows="2" placeholder="One line — the thing that would make today count…"></textarea>
-    <div class="hint">Leave blank to keep the system's pick. Dictate with the 🎤 on your keyboard.</div>
+  <section id="oneSec">
+    <div class="lbl">The one thing — is this right?</div>
+    <div class="proposal" id="proposal">Loading today's pick…</div>
+    <div class="opts two" id="onecheck" style="margin-top:10px">
+      <button class="opt" data-v="yes">✓ That's it</button>
+      <button class="opt" data-v="no">✎ Something else</button>
+    </div>
+    <div id="oneEdit" hidden style="margin-top:10px">
+      <textarea id="one" rows="2" placeholder="So what IS the one thing today?"></textarea>
+      <div class="hint">This becomes the headline of your brief. Dictate with the 🎤 key.</div>
+    </div>
   </section>
 
   <section>
@@ -138,7 +147,15 @@
       if (navigator.vibrate) navigator.vibrate(8);
     });
   }
-  ['shape','protect','energy'].forEach(wire);
+  ['shape','protect','energy','onecheck'].forEach(wire);
+
+  // "Something else" reveals the text box and focuses it; "That's it" confirms the pick.
+  document.getElementById('onecheck').addEventListener('click', function(e){
+    var b=e.target.closest('button.opt'); if(!b) return;
+    var edit=document.getElementById('oneEdit');
+    edit.hidden = (b.dataset.v!=='no');
+    if(b.dataset.v==='no') setTimeout(function(){document.getElementById('one').focus();},60);
+  });
 
   // Pre-fill context: the 6:20 push publishes a `ctx:{...}` message we can read back.
   if (topic){
@@ -159,7 +176,12 @@
           if(ctx.sleep!=null) bits.push('Sleep '+ctx.sleep+'h');
           if(ctx.training) bits.push(ctx.training);
           document.getElementById('ctx').textContent = bits.join(' · ');
-          if(ctx.one){ document.getElementById('one').placeholder = 'System says: '+ctx.one; }
+          if(ctx.one){
+            document.getElementById('proposal').textContent = ctx.one;
+            window.__systemOne = ctx.one;
+          } else {
+            document.getElementById('proposal').textContent = '(no pick — tell me below)';
+          }
           if(ctx.guess){
             var g=document.querySelector('#shape button[data-v="'+ctx.guess+'"]');
             if(g){ g.setAttribute('aria-pressed','true'); picked.shape=ctx.guess; }
@@ -171,11 +193,14 @@
   document.getElementById('send').addEventListener('click', function(){
     var err = document.getElementById('err');
     if(!topic){ err.textContent='No topic set — open this from your saved link (…?t=your-topic).'; return; }
+    var typed = document.getElementById('one').value.trim();
     var payload = {
       shape:   picked.shape   || '',
       protect: picked.protect || '',
       energy:  picked.energy  || '',
-      one:  document.getElementById('one').value.trim(),
+      // one = what Mark VERIFIED. Confirmed → the system's pick (locks it in); changed → his text.
+      one: (picked.onecheck === 'no' ? typed : (picked.onecheck === 'yes' ? (window.__systemOne || '') : typed)),
+      one_confirmed: picked.onecheck === 'yes' ? '1' : '',
       note: document.getElementById('note').value.trim()
     };
     var btn=this; btn.disabled=true; btn.textContent='Sending…';
