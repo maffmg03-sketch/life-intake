@@ -34,17 +34,16 @@
   .opts.two{grid-template-columns:1fr 1fr}
   .opts.three{grid-template-columns:1fr 1fr 1fr}
   button.opt{appearance:none;border:1.5px solid var(--bd);background:transparent;color:var(--ink);
-       border-radius:11px;padding:13px 10px;font-size:15px;font-weight:600;cursor:pointer;
+       border-radius:11px;padding:12px 10px;font-size:14.5px;font-weight:600;cursor:pointer;
        transition:.12s;text-align:center;font-family:inherit}
+  button.opt.cand{text-align:left;font-weight:500;font-size:14.5px;line-height:1.35}
   button.opt:active{transform:scale(.97)}
   button.opt[aria-pressed="true"]{background:var(--accent-bg);border-color:var(--accent);
        color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-  textarea,input[type=text]{width:100%;border:1.5px solid var(--bd);border-radius:11px;
+  textarea{width:100%;border:1.5px solid var(--bd);border-radius:11px;
        background:transparent;color:var(--ink);padding:12px;font:inherit;resize:vertical}
-  textarea:focus,input:focus{outline:none;border-color:var(--accent)}
+  textarea:focus{outline:none;border-color:var(--accent)}
   .hint{color:var(--faint);font-size:12.5px;margin-top:8px}
-  .proposal{background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:11px;
-       padding:12px 13px;font-size:15.5px;line-height:1.4;color:var(--ink);font-weight:500}
   footer{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
        background:linear-gradient(to top,var(--bg) 72%,transparent);}
   #send{width:100%;border:0;border-radius:13px;background:var(--accent);color:#fff;
@@ -60,57 +59,74 @@
 <div id="app">
   <header>
     <h1 id="date">Morning</h1>
-    <div class="sub" id="sub">Two taps. Then your brief.</div>
+    <div class="sub">Six taps. Then your brief.</div>
     <div class="ctx" id="ctx"></div>
   </header>
 
+  <!-- Q1 — THE ONE THING (ranked candidates from the system) -->
   <section>
-    <div class="lbl">What's today's shape?</div>
-    <div class="opts three" id="shape">
-      <button class="opt" data-v="heads">📝<br>Heads-down</button>
-      <button class="opt" data-v="meetings">🤝<br>Meetings</button>
-      <button class="opt" data-v="admin">🧹<br>Admin</button>
-      <button class="opt" data-v="light">🌿<br>Light</button>
-      <button class="opt" data-v="travel">✈️<br>Travel</button>
-      <button class="opt" data-v="writing">✍️<br>Writing</button>
-    </div>
-  </section>
-
-  <section id="oneSec">
-    <div class="lbl">The one thing — is this right?</div>
-    <div class="proposal" id="proposal">Loading today's pick…</div>
-    <div class="opts two" id="onecheck" style="margin-top:10px">
-      <button class="opt" data-v="yes">✓ That's it</button>
-      <button class="opt" data-v="no">✎ Something else</button>
-    </div>
+    <div class="lbl">1 · The one thing today</div>
+    <div class="opts" id="one" data-single="1"></div>
     <div id="oneEdit" hidden style="margin-top:10px">
-      <textarea id="one" rows="2" placeholder="So what IS the one thing today?"></textarea>
+      <textarea id="oneText" rows="2" placeholder="So what IS the one thing today?"></textarea>
       <div class="hint">This becomes the headline of your brief. Dictate with the 🎤 key.</div>
     </div>
   </section>
 
+  <!-- Q2 — energy -->
   <section>
-    <div class="lbl">Protect anything?</div>
-    <div class="opts two" id="protect">
-      <button class="opt" data-v="focus">Morning focus</button>
-      <button class="opt" data-v="workout">The workout</button>
-      <button class="opt" data-v="family">Family time</button>
-      <button class="opt" data-v="none">Nothing</button>
-    </div>
-  </section>
-
-  <section>
-    <div class="lbl">Energy</div>
-    <div class="opts three" id="energy">
+    <div class="lbl">2 · Energy / headspace</div>
+    <div class="opts three" id="energy" data-single="1">
       <button class="opt" data-v="good">🟢 Good</button>
       <button class="opt" data-v="ok">🟡 OK</button>
       <button class="opt" data-v="frayed">🔴 Frayed</button>
     </div>
   </section>
 
+  <!-- Q3 — training intent -->
   <section>
-    <div class="lbl">Anything on your mind?</div>
-    <textarea id="note" rows="2" placeholder="Optional — goes to the consult, not the card."></textarea>
+    <div class="lbl">3 · Training today</div>
+    <div class="opts two" id="training" data-single="1">
+      <button class="opt" data-v="scheduled" id="schedBtn">As scheduled</button>
+      <button class="opt" data-v="lighter">Lighter than planned</button>
+      <button class="opt" data-v="swap">Swap to cardio/F45</button>
+      <button class="opt" data-v="rest">Rest instead</button>
+    </div>
+  </section>
+
+  <!-- Q4 — deep work start -->
+  <section>
+    <div class="lbl">4 · Deep work starts</div>
+    <div class="opts three" id="dw" data-single="1">
+      <button class="opt" data-v="now">Right away</button>
+      <button class="opt" data-v="after_gym">After the gym</button>
+      <button class="opt" data-v="midmorning">Mid-morning</button>
+      <button class="opt" data-v="afternoon">Afternoon</button>
+      <button class="opt" data-v="none">Not today</button>
+    </div>
+  </section>
+
+  <!-- Q5 — owed -->
+  <section>
+    <div class="lbl">5 · Do you owe anyone something?</div>
+    <div class="opts three" id="owed" data-single="1">
+      <button class="opt" data-v="bri">Bri</button>
+      <button class="opt" data-v="student">A student</button>
+      <button class="opt" data-v="coauthor">A coauthor</button>
+      <button class="opt" data-v="family">Family</button>
+      <button class="opt" data-v="none">No one</button>
+    </div>
+  </section>
+
+  <!-- Q6 — yesterday -->
+  <section>
+    <div class="lbl">6 · Yesterday, honestly</div>
+    <div class="opts two" id="yday" data-single="1">
+      <button class="opt" data-v="won">Won it</button>
+      <button class="opt" data-v="fine">Fine</button>
+      <button class="opt" data-v="scattered">Scattered</button>
+      <button class="opt" data-v="lost">Lost it</button>
+    </div>
   </section>
 
   <div class="err" id="err"></div>
@@ -119,7 +135,7 @@
 <div id="done" class="ok" hidden>
   <div class="big">✓</div>
   <h1>Got it</h1>
-  <div class="sub" id="doneSub">Your brief will reflect this.</div>
+  <div class="sub">Your brief will reflect this.</div>
 </div>
 
 <footer id="foot"><button id="send">Send · then brief me</button></footer>
@@ -144,20 +160,31 @@
       [].forEach.call(box.querySelectorAll('button.opt'), function(x){ x.setAttribute('aria-pressed','false'); });
       b.setAttribute('aria-pressed','true');
       picked[id] = b.dataset.v;
+      if (id==='one'){
+        document.getElementById('oneEdit').hidden = (b.dataset.v!=='__other');
+        if(b.dataset.v==='__other') setTimeout(function(){document.getElementById('oneText').focus();},60);
+      }
       if (navigator.vibrate) navigator.vibrate(8);
     });
   }
-  ['shape','protect','energy','onecheck'].forEach(wire);
+  ['one','energy','training','dw','owed','yday'].forEach(wire);
 
-  // "Something else" reveals the text box and focuses it; "That's it" confirms the pick.
-  document.getElementById('onecheck').addEventListener('click', function(e){
-    var b=e.target.closest('button.opt'); if(!b) return;
-    var edit=document.getElementById('oneEdit');
-    edit.hidden = (b.dataset.v!=='no');
-    if(b.dataset.v==='no') setTimeout(function(){document.getElementById('one').focus();},60);
-  });
+  // Build Q1 from the system's ranked candidates (published as ctx:{...} at 6:20).
+  function buildOne(cands){
+    var box=document.getElementById('one'); box.innerHTML='';
+    (cands||[]).slice(0,4).forEach(function(c,i){
+      var b=document.createElement('button');
+      b.className='opt cand'; b.dataset.v=c;
+      b.textContent=(i===0?'★ ':'')+c;
+      box.appendChild(b);
+    });
+    var other=document.createElement('button');
+    other.className='opt cand'; other.dataset.v='__other';
+    other.textContent='✎ Something else…';
+    box.appendChild(other);
+  }
+  buildOne([]);  // empty until ctx loads
 
-  // Pre-fill context: the 6:20 push publishes a `ctx:{...}` message we can read back.
   if (topic){
     fetch('https://ntfy.sh/'+topic+'/json?poll=1&since=12h')
       .then(function(r){ return r.text(); })
@@ -176,16 +203,12 @@
           if(ctx.sleep!=null) bits.push('Sleep '+ctx.sleep+'h');
           if(ctx.training) bits.push(ctx.training);
           document.getElementById('ctx').textContent = bits.join(' · ');
-          if(ctx.one){
-            document.getElementById('proposal').textContent = ctx.one;
-            window.__systemOne = ctx.one;
-          } else {
-            document.getElementById('proposal').textContent = '(no pick — tell me below)';
+          if(ctx.training){
+            document.getElementById('schedBtn').textContent='As scheduled ('+ctx.training+')';
           }
-          if(ctx.guess){
-            var g=document.querySelector('#shape button[data-v="'+ctx.guess+'"]');
-            if(g){ g.setAttribute('aria-pressed','true'); picked.shape=ctx.guess; }
-          }
+          var cands = ctx.candidates && ctx.candidates.length ? ctx.candidates
+                     : (ctx.one ? [ctx.one] : []);
+          buildOne(cands);
         }
       }).catch(function(){});
   }
@@ -193,18 +216,18 @@
   document.getElementById('send').addEventListener('click', function(){
     var err = document.getElementById('err');
     if(!topic){ err.textContent='No topic set — open this from your saved link (…?t=your-topic).'; return; }
-    var typed = document.getElementById('one').value.trim();
+    var oneVal = picked.one==='__other' ? document.getElementById('oneText').value.trim()
+               : (picked.one || '');
     var payload = {
-      shape:   picked.shape   || '',
-      protect: picked.protect || '',
-      energy:  picked.energy  || '',
-      // one = what Mark VERIFIED. Confirmed → the system's pick (locks it in); changed → his text.
-      one: (picked.onecheck === 'no' ? typed : (picked.onecheck === 'yes' ? (window.__systemOne || '') : typed)),
-      one_confirmed: picked.onecheck === 'yes' ? '1' : '',
-      note: document.getElementById('note').value.trim()
+      one: oneVal,
+      one_confirmed: (picked.one && picked.one!=='__other') ? '1' : '',
+      energy: picked.energy || '',
+      training: picked.training || '',
+      dw: picked.dw || '',
+      owed: picked.owed || '',
+      yday: picked.yday || ''
     };
     var btn=this; btn.disabled=true; btn.textContent='Sending…';
-    // ONE atomic message; brief.py merges the json blob.
     fetch('https://ntfy.sh/'+topic, {
       method:'POST',
       body:'intake:'+iso+':json:'+JSON.stringify(payload)
