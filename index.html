@@ -3,243 +3,285 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f1ea">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Morning">
-<title>Morning Intake</title>
+<title>Morning Check-In</title>
 <link rel="manifest" href="manifest.json">
 <style>
   :root{
-    --bg:#f6f8fa; --card:#fff; --ink:#14181f; --muted:#5b6472; --faint:#98a2ae;
-    --accent:#2f4a73; --accent-bg:#eef2f8; --accent-bd:#d3ddec; --green:#1f8a4c;
-    --amber:#a8790f; --red:#b0403a; --bd:#e6e9ee;
+    --paper:#f4f1ea; --surface:#fffdf8; --ink:#19221f; --muted:#64706a;
+    --quiet:#8c958f; --line:#deddd5; --forest:#244f43; --forest-2:#356b5c;
+    --wash:#e5eee9; --warm:#a86432; --shadow:0 14px 34px rgba(38,48,43,.08);
   }
   @media (prefers-color-scheme:dark){
-    :root{--bg:#0f1216;--card:#171b21;--ink:#e9edf2;--muted:#9aa4b2;--faint:#6b7683;
-          --accent:#7ea2d8;--accent-bg:#1b2330;--accent-bd:#2b3646;--bd:#252c36;}
+    :root{
+      --paper:#111714; --surface:#18201c; --ink:#edf2ee; --muted:#aab5ae;
+      --quiet:#7f8c84; --line:#303a34; --forest:#8fc5b0; --forest-2:#72ad96;
+      --wash:#23342d; --warm:#dda176; --shadow:none;
+    }
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;background:var(--bg);color:var(--ink);
-       font:16px/1.45 -apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
-       padding:max(16px,env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom));}
-  header{margin:8px 2px 18px}
-  h1{font-size:26px;margin:0;letter-spacing:-.4px}
-  .sub{color:var(--accent);font-weight:600;font-size:14px;margin-top:4px}
-  .ctx{color:var(--faint);font-size:13px;margin-top:2px}
-  section{background:var(--card);border:1px solid var(--bd);border-radius:14px;
-          padding:14px;margin-bottom:12px}
-  .lbl{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);
-       font-weight:700;margin-bottom:10px}
-  .opts{display:grid;gap:8px}
-  .opts.two{grid-template-columns:1fr 1fr}
-  .opts.three{grid-template-columns:1fr 1fr 1fr}
-  button.opt{appearance:none;border:1.5px solid var(--bd);background:transparent;color:var(--ink);
-       border-radius:11px;padding:12px 10px;font-size:14.5px;font-weight:600;cursor:pointer;
-       transition:.12s;text-align:center;font-family:inherit}
-  button.opt.cand{text-align:left;font-weight:500;font-size:14.5px;line-height:1.35}
-  button.opt:active{transform:scale(.97)}
-  button.opt[aria-pressed="true"]{background:var(--accent-bg);border-color:var(--accent);
-       color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-  textarea{width:100%;border:1.5px solid var(--bd);border-radius:11px;
-       background:transparent;color:var(--ink);padding:12px;font:inherit;resize:vertical}
-  textarea:focus{outline:none;border-color:var(--accent)}
-  .hint{color:var(--faint);font-size:12.5px;margin-top:8px}
-  footer{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-       background:linear-gradient(to top,var(--bg) 72%,transparent);}
-  #send{width:100%;border:0;border-radius:13px;background:var(--accent);color:#fff;
-       padding:16px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
+  html{background:var(--paper)}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font:16px/1.42 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+       padding:max(22px,env(safe-area-inset-top)) 16px calc(112px + env(safe-area-inset-bottom));}
+  main{width:min(100%,560px);margin:0 auto}
+  header{padding:8px 4px 24px}
+  .eyebrow{font-size:12px;line-height:1;text-transform:uppercase;letter-spacing:.16em;
+           color:var(--forest);font-weight:750;margin-bottom:10px}
+  h1{font-family:ui-serif,Georgia,serif;font-size:clamp(31px,9vw,43px);line-height:1.02;
+     letter-spacing:-.035em;margin:0;font-weight:650}
+  .promise{color:var(--muted);font-size:15px;margin:10px 0 0}
+  .context{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px;min-height:28px}
+  .chip{border:1px solid var(--line);background:rgba(255,255,255,.28);color:var(--muted);
+        border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:650}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;
+         padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .step{display:flex;align-items:baseline;gap:9px;margin-bottom:5px}
+  .num{color:var(--forest);font-size:12px;font-weight:800;letter-spacing:.12em}
+  h2{font-size:19px;line-height:1.22;letter-spacing:-.015em;margin:0}
+  .help{color:var(--muted);font-size:13.5px;margin:0 0 14px 27px}
+  .options{display:grid;gap:9px}
+  button{font:inherit}
+  .option{appearance:none;width:100%;min-height:52px;border:1.5px solid var(--line);
+          background:transparent;color:var(--ink);border-radius:14px;padding:13px 14px;
+          cursor:pointer;text-align:left;font-weight:650;transition:transform .1s,border-color .1s,background .1s}
+  .option:active{transform:scale(.985)}
+  .option[aria-pressed="true"]{background:var(--wash);border-color:var(--forest);color:var(--forest)}
+  .candidate{font-size:15px;line-height:1.33;font-weight:600}
+  .candidate small{display:block;color:var(--forest);font-size:10px;letter-spacing:.12em;
+                   text-transform:uppercase;margin-bottom:4px;font-weight:800}
+  .timing{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .timing .option{text-align:center;padding:12px 7px;font-size:14px}
+  .timing .wide{grid-column:1/-1}
+  textarea{width:100%;min-height:88px;border:1.5px solid var(--line);border-radius:14px;
+           background:transparent;color:var(--ink);padding:13px;font:inherit;resize:vertical;margin-top:9px}
+  textarea:focus-visible,.option:focus-visible,#send:focus-visible,summary:focus-visible{
+    outline:3px solid color-mix(in srgb,var(--forest) 30%,transparent);outline-offset:2px}
+  .hint{color:var(--quiet);font-size:12.5px;margin:7px 2px 0}
+  details{background:var(--surface);border:1px solid var(--line);border-radius:17px;
+          margin:14px 0;padding:0 16px}
+  summary{cursor:pointer;list-style:none;padding:15px 0;font-weight:700;color:var(--muted)}
+  summary::-webkit-details-marker{display:none}
+  summary:after{content:"+";float:right;color:var(--forest);font-size:20px;line-height:18px}
+  details[open] summary:after{content:"−"}
+  .adjust{border-top:1px solid var(--line);padding:15px 0 17px}
+  .adjust-group+.adjust-group{margin-top:17px}
+  .adjust-label{font-size:12px;text-transform:uppercase;letter-spacing:.11em;
+                color:var(--quiet);font-weight:800;margin-bottom:8px}
+  .adjust .options{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .adjust .option{text-align:center;min-height:46px;padding:10px 5px;font-size:13px}
+  .status{min-height:20px;color:var(--warm);font-size:13px;text-align:center;margin:10px 0}
+  footer{position:fixed;left:0;right:0;bottom:0;padding:13px 16px calc(13px + env(safe-area-inset-bottom));
+         background:linear-gradient(to top,var(--paper) 78%,transparent);z-index:5}
+  .foot-inner{width:min(100%,560px);margin:0 auto}
+  #send{appearance:none;width:100%;min-height:57px;border:0;border-radius:16px;
+        background:var(--forest);color:#fff;padding:15px 18px;font-size:17px;font-weight:780;
+        box-shadow:0 8px 22px rgba(36,79,67,.2);cursor:pointer}
   #send:active{transform:scale(.99)}
-  #send[disabled]{opacity:.5}
-  .ok{text-align:center;padding:40px 16px}
-  .ok .big{font-size:44px}
-  .err{color:var(--red);font-size:13px;margin-top:8px;text-align:center}
+  #send[disabled]{opacity:.38;box-shadow:none;cursor:default}
+  .done{text-align:center;padding:22vh 24px 0}
+  .done-mark{width:58px;height:58px;margin:0 auto 18px;border-radius:50%;display:grid;
+             place-items:center;background:var(--wash);color:var(--forest);font-size:28px;font-weight:800}
+  .done h1{font-size:36px}
+  .done p{color:var(--muted);margin-top:10px}
+  [hidden]{display:none!important}
+  @media (max-width:360px){
+    body{padding-left:12px;padding-right:12px}.panel{padding:15px}.help{margin-left:25px}
+  }
 </style>
 </head>
 <body>
-<div id="app">
+<main id="app">
   <header>
-    <h1 id="date">Morning</h1>
-    <div class="sub">Six taps. Then your brief.</div>
-    <div class="ctx" id="ctx"></div>
+    <div class="eyebrow">Morning check-in</div>
+    <h1 id="date">Good morning.</h1>
+    <p class="promise">Choose the work and the window. Everything else is optional.</p>
+    <div class="context" id="context" aria-live="polite"></div>
   </header>
 
-  <!-- Q1 — THE ONE THING (ranked candidates from the system) -->
-  <section>
-    <div class="lbl">1 · The one thing today</div>
-    <div class="opts" id="one" data-single="1"></div>
-    <div id="oneEdit" hidden style="margin-top:10px">
-      <textarea id="oneText" rows="2" placeholder="So what IS the one thing today?"></textarea>
-      <div class="hint">This becomes the headline of your brief. Dictate with the 🎤 key.</div>
+  <section class="panel">
+    <div class="step"><span class="num">01</span><h2>What gets the first real block?</h2></div>
+    <p class="help">Pick one. This becomes the brief headline.</p>
+    <div class="options" id="one" data-single="1"></div>
+    <div id="oneEdit" hidden>
+      <textarea id="oneText" rows="3" maxlength="160" placeholder="Write or dictate the next concrete action"></textarea>
+      <div class="hint">Make it something you can start, not a project name.</div>
     </div>
   </section>
 
-  <!-- Q2 — energy -->
-  <section>
-    <div class="lbl">2 · Energy / headspace</div>
-    <div class="opts three" id="energy" data-single="1">
-      <button class="opt" data-v="good">🟢 Good</button>
-      <button class="opt" data-v="ok">🟡 OK</button>
-      <button class="opt" data-v="frayed">🔴 Frayed</button>
+  <section class="panel">
+    <div class="step"><span class="num">02</span><h2>When does it start?</h2></div>
+    <p class="help" id="planHint">Optional—leave blank to keep the planned block.</p>
+    <div class="options timing" id="dw" data-single="1">
+      <button class="option" data-v="now">Right away</button>
+      <button class="option" data-v="after_gym">After training</button>
+      <button class="option" data-v="midmorning">Mid-morning</button>
+      <button class="option" data-v="afternoon">Afternoon</button>
+      <button class="option wide" data-v="none">No focused-work block today</button>
     </div>
   </section>
 
-  <!-- Q3 — training intent -->
-  <section>
-    <div class="lbl">3 · Training today</div>
-    <div class="opts two" id="training" data-single="1">
-      <button class="opt" data-v="scheduled" id="schedBtn">As scheduled</button>
-      <button class="opt" data-v="lighter">Lighter than planned</button>
-      <button class="opt" data-v="swap">Swap to cardio/F45</button>
-      <button class="opt" data-v="rest">Rest instead</button>
+  <details>
+    <summary>Adjust capacity or training</summary>
+    <div class="adjust">
+      <div class="adjust-group">
+        <div class="adjust-label">Headspace</div>
+        <div class="options" id="energy" data-single="1">
+          <button class="option" data-v="good">Full</button>
+          <button class="option" data-v="ok">Steady</button>
+          <button class="option" data-v="frayed">Frayed</button>
+        </div>
+      </div>
+      <div class="adjust-group">
+        <div class="adjust-label">Training change</div>
+        <div class="options" id="training" data-single="1">
+          <button class="option" data-v="lighter">Lighter</button>
+          <button class="option" data-v="swap">Swap</button>
+          <button class="option" data-v="rest">Rest</button>
+        </div>
+        <div class="hint" id="trainingHint">Leave blank to keep the scheduled session.</div>
+      </div>
     </div>
-  </section>
+  </details>
 
-  <!-- Q4 — deep work start -->
-  <section>
-    <div class="lbl">4 · Deep work starts</div>
-    <div class="opts three" id="dw" data-single="1">
-      <button class="opt" data-v="now">Right away</button>
-      <button class="opt" data-v="after_gym">After the gym</button>
-      <button class="opt" data-v="midmorning">Mid-morning</button>
-      <button class="opt" data-v="afternoon">Afternoon</button>
-      <button class="opt" data-v="none">Not today</button>
-    </div>
-  </section>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+</main>
 
-  <!-- Q5 — owed -->
-  <section>
-    <div class="lbl">5 · Do you owe anyone something?</div>
-    <div class="opts three" id="owed" data-single="1">
-      <button class="opt" data-v="bri">Bri</button>
-      <button class="opt" data-v="student">A student</button>
-      <button class="opt" data-v="coauthor">A coauthor</button>
-      <button class="opt" data-v="family">Family</button>
-      <button class="opt" data-v="none">No one</button>
-    </div>
-  </section>
+<main id="done" class="done" hidden>
+  <div class="done-mark">✓</div>
+  <h1>That’s enough.</h1>
+  <p>Your brief is building around the call you just made.</p>
+</main>
 
-  <!-- Q6 — yesterday -->
-  <section>
-    <div class="lbl">6 · Yesterday, honestly</div>
-    <div class="opts two" id="yday" data-single="1">
-      <button class="opt" data-v="won">Won it</button>
-      <button class="opt" data-v="fine">Fine</button>
-      <button class="opt" data-v="scattered">Scattered</button>
-      <button class="opt" data-v="lost">Lost it</button>
-    </div>
-  </section>
-
-  <div class="err" id="err"></div>
-</div>
-
-<div id="done" class="ok" hidden>
-  <div class="big">✓</div>
-  <h1>Got it</h1>
-  <div class="sub">Your brief will reflect this.</div>
-</div>
-
-<footer id="foot"><button id="send">Send · then brief me</button></footer>
+<footer id="foot">
+  <div class="foot-inner"><button id="send" disabled>Pick a focus</button></div>
+</footer>
 
 <script>
 (function(){
-  var qs = new URLSearchParams(location.search);
-  // The ntfy topic comes from the URL (your home-screen bookmark), never from this public page.
-  var topic = qs.get('t') || localStorage.getItem('intakeTopic') || '';
-  if (topic) localStorage.setItem('intakeTopic', topic);
+  'use strict';
+  var qs=new URLSearchParams(location.search);
+  var demo=(location.hostname==='127.0.0.1'||location.hostname==='localhost')&&qs.get('demo')==='1';
+  var topic=demo?'demo':(qs.get('t')||localStorage.getItem('intakeTopic')||'');
+  if(topic) localStorage.setItem('intakeTopic',topic);
 
-  var d = new Date();
-  var iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  document.getElementById('date').textContent =
-    d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'});
+  var now=new Date();
+  var iso=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  document.getElementById('date').textContent=now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
 
-  var picked = {};
+  var picked={};
+  var send=document.getElementById('send');
+  var oneText=document.getElementById('oneText');
+  function selectedFocus(){
+    return picked.one==='__other' ? oneText.value.trim() : (picked.one||'');
+  }
+  function updateSend(){
+    var noBlock=picked.dw==='none';
+    var ready=Boolean(selectedFocus())||noBlock;
+    send.disabled=!ready;
+    send.textContent=ready?(noBlock?'Build a light-day brief':'Build my brief'):'Pick a focus';
+  }
   function wire(id){
-    var box = document.getElementById(id);
-    box.addEventListener('click', function(e){
-      var b = e.target.closest('button.opt'); if(!b) return;
-      [].forEach.call(box.querySelectorAll('button.opt'), function(x){ x.setAttribute('aria-pressed','false'); });
-      b.setAttribute('aria-pressed','true');
-      picked[id] = b.dataset.v;
-      if (id==='one'){
-        document.getElementById('oneEdit').hidden = (b.dataset.v!=='__other');
-        if(b.dataset.v==='__other') setTimeout(function(){document.getElementById('oneText').focus();},60);
+    var box=document.getElementById(id);
+    box.addEventListener('click',function(e){
+      var b=e.target.closest('button.option'); if(!b)return;
+      var was=b.getAttribute('aria-pressed')==='true';
+      [].forEach.call(box.querySelectorAll('button.option'),function(x){x.setAttribute('aria-pressed','false');});
+      if(was){delete picked[id];}
+      else{b.setAttribute('aria-pressed','true');picked[id]=b.dataset.v;}
+      if(id==='one'){
+        document.getElementById('oneEdit').hidden=(picked.one!=='__other');
+        if(picked.one==='__other')setTimeout(function(){oneText.focus();},50);
       }
-      if (navigator.vibrate) navigator.vibrate(8);
+      updateSend();
+      if(navigator.vibrate)navigator.vibrate(7);
     });
   }
-  ['one','energy','training','dw','owed','yday'].forEach(wire);
+  ['one','dw','energy','training'].forEach(wire);
+  oneText.addEventListener('input',updateSend);
 
-  // Build Q1 from the system's ranked candidates (published as ctx:{...} at 6:20).
   function buildOne(cands){
-    var box=document.getElementById('one'); box.innerHTML='';
-    (cands||[]).slice(0,4).forEach(function(c,i){
+    var box=document.getElementById('one');box.innerHTML='';
+    (cands||[]).slice(0,3).forEach(function(c,i){
       var b=document.createElement('button');
-      b.className='opt cand'; b.dataset.v=c;
-      b.textContent=(i===0?'★ ':'')+c;
-      box.appendChild(b);
+      b.className='option candidate';b.dataset.v=c;b.setAttribute('aria-pressed','false');
+      if(i===0){var tag=document.createElement('small');tag.textContent='System pick';b.appendChild(tag);}
+      b.appendChild(document.createTextNode(c));box.appendChild(b);
     });
     var other=document.createElement('button');
-    other.className='opt cand'; other.dataset.v='__other';
-    other.textContent='✎ Something else…';
-    box.appendChild(other);
+    other.className='option candidate';other.dataset.v='__other';other.setAttribute('aria-pressed','false');
+    other.textContent='Write a different next action';box.appendChild(other);
   }
-  buildOne([]);  // empty until ctx loads
+  buildOne([]);
 
-  if (topic){
-    fetch('https://ntfy.sh/'+topic+'/json?poll=1&since=12h')
-      .then(function(r){ return r.text(); })
-      .then(function(t){
-        var ctx=null;
-        t.trim().split('\n').forEach(function(line){
-          try{ var m=JSON.parse(line);
-            if(m.event==='message' && (m.message||'').indexOf('ctx:')===0){
-              ctx = JSON.parse(m.message.slice(4));
+  function chip(text){
+    var el=document.createElement('span');el.className='chip';el.textContent=text;
+    document.getElementById('context').appendChild(el);
+  }
+  function useContext(ctx){
+    var context=document.getElementById('context');context.innerHTML='';
+    if(ctx.rec!=null)chip('Recovery '+ctx.rec+'%');
+    if(ctx.sleep!=null)chip('Sleep '+ctx.sleep+'h');
+    if(ctx.training){chip(ctx.training);document.getElementById('trainingHint').textContent='Scheduled: '+ctx.training+'. Leave blank to keep it.';}
+    if(ctx.block)document.getElementById('planHint').textContent='Planned: '+ctx.block+'. Leave blank to keep it.';
+    var cands=ctx.candidates&&ctx.candidates.length?ctx.candidates:(ctx.one?[ctx.one]:[]);
+    buildOne(cands);
+  }
+
+  if(demo){
+    useContext({date:iso,rec:72,sleep:7.6,training:'Strength B',block:'after Strength B, 11:00–12:30',
+      candidates:['Prep the Singapore PhD research session','Reply to Ryan Barthel','Send Orbis data to Mario']});
+  }else if(topic){
+    fetch('https://ntfy.sh/'+encodeURIComponent(topic)+'/json?poll=1&since=12h')
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.text();})
+      .then(function(text){
+        var latest=null;
+        text.trim().split('\n').forEach(function(line){
+          try{
+            var m=JSON.parse(line);
+            if(m.event==='message'&&(m.message||'').indexOf('ctx:')===0){
+              var c=JSON.parse(m.message.slice(4));
+              if(c.date===iso)latest=c;
             }
           }catch(e){}
         });
-        if(ctx){
-          var bits=[];
-          if(ctx.rec!=null) bits.push('Recovery '+ctx.rec+'%');
-          if(ctx.sleep!=null) bits.push('Sleep '+ctx.sleep+'h');
-          if(ctx.training) bits.push(ctx.training);
-          document.getElementById('ctx').textContent = bits.join(' · ');
-          if(ctx.training){
-            document.getElementById('schedBtn').textContent='As scheduled ('+ctx.training+')';
-          }
-          var cands = ctx.candidates && ctx.candidates.length ? ctx.candidates
-                     : (ctx.one ? [ctx.one] : []);
-          buildOne(cands);
-        }
-      }).catch(function(){});
+        if(latest)useContext(latest);
+        else{chip('Morning context unavailable');document.getElementById('status').textContent='The system did not publish fresh context yet. You can still write your own focus.';}
+      })
+      .catch(function(){chip('Offline context');document.getElementById('status').textContent='Could not load the morning context. You can still submit a written focus.';});
+  }else{
+    chip('Setup needed');
+    document.getElementById('status').textContent='Open the private saved link once to connect this check-in.';
   }
 
-  document.getElementById('send').addEventListener('click', function(){
-    var err = document.getElementById('err');
-    if(!topic){ err.textContent='No topic set — open this from your saved link (…?t=your-topic).'; return; }
-    var oneVal = picked.one==='__other' ? document.getElementById('oneText').value.trim()
-               : (picked.one || '');
-    var payload = {
-      one: oneVal,
-      one_confirmed: (picked.one && picked.one!=='__other') ? '1' : '',
-      energy: picked.energy || '',
-      training: picked.training || '',
-      dw: picked.dw || '',
-      owed: picked.owed || '',
-      yday: picked.yday || ''
+  send.addEventListener('click',function(){
+    var status=document.getElementById('status');
+    if(!topic){status.textContent='No private topic is connected. Open the saved link and try again.';return;}
+    var focus=selectedFocus();
+    if(!focus&&picked.dw!=='none'){status.textContent='Pick a focus or choose “No focused-work block today.”';return;}
+    var payload={
+      one:focus,
+      one_confirmed:(picked.one&&picked.one!=='__other')?'1':'',
+      energy:picked.energy||'',
+      training:picked.training||'',
+      dw:picked.dw||''
     };
-    var btn=this; btn.disabled=true; btn.textContent='Sending…';
-    fetch('https://ntfy.sh/'+topic, {
-      method:'POST',
-      body:'intake:'+iso+':json:'+JSON.stringify(payload)
-    }).then(function(r){
-      if(!r.ok) throw new Error(r.status);
-      document.getElementById('app').hidden=true;
-      document.getElementById('foot').hidden=true;
+    send.disabled=true;send.textContent='Sending…';status.textContent='';
+    if(demo){
+      document.getElementById('app').hidden=true;document.getElementById('foot').hidden=true;
+      document.getElementById('done').hidden=false;return;
+    }
+    fetch('https://ntfy.sh/'+encodeURIComponent(topic),{
+      method:'POST',body:'intake:'+iso+':json:'+JSON.stringify(payload)
+    }).then(function(r){if(!r.ok)throw new Error(r.status);
+      document.getElementById('app').hidden=true;document.getElementById('foot').hidden=true;
       document.getElementById('done').hidden=false;
-      if (navigator.vibrate) navigator.vibrate([10,40,10]);
+      if(navigator.vibrate)navigator.vibrate([10,35,10]);
     }).catch(function(e){
-      btn.disabled=false; btn.textContent='Send · then brief me';
-      err.textContent='Could not send ('+e.message+'). Check signal and retry.';
+      send.disabled=false;updateSend();status.textContent='Could not send ('+e.message+'). Check the connection and retry.';
     });
   });
 })();
